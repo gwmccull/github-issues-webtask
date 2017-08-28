@@ -72,13 +72,13 @@ module.exports = function (context, cb) {
 					msg = 'Issue created successfully.';
 					return cb(null, msg);
 				})
-				.catch((err) => {
+				.catch((error) => {
 					err = 'An error occurred while creating the Github issue.';
-					return cb(err);
+					return cb(error);
 				});
 		})
-		.catch(function (err) {
-			if (err.statusCode === 404) {
+		.catch(function (error) {
+			if (error.statusCode === 404) {
 				err = 'Unable to find ISSUE_TEMPLATE.md in that repository.';
 			} else {
 				err = 'Unknown error.';
