@@ -2,7 +2,6 @@
 
 const rp = require('request-promise-native');
 const moment = require('moment');
-require('moment-recur');
 
 const API_URL = 'https://api.github.com/';
 const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/';
@@ -54,6 +53,11 @@ module.exports = function (context, cb) {
 	rp(Object.assign({}, defaultOptions, templateOptions))
 		.then((issueTemplate) => {
 			const title = generateIssueTitle(dayOfWeek, weekOfMonth);
+			if (!title) {
+				err = 'Unable to generate title based on requested date';
+				cb(err);
+			}
+
 			const issueOptions = {
 				method: 'POST',
 				uri: `${API_URL}repos/${owner}/${repo}/issues`,
@@ -84,17 +88,44 @@ module.exports = function (context, cb) {
 };
 
 function getNextMeeting(dayOfWeek, weekOfMonth) {
+	// reminder: moment mutates the original date
 	const date = moment();
-	const firstOfNextMonth = date.month(date.month() + 1).date(1);
-	return moment(firstOfNextMonth).recur().every(dayOfWeek).daysOfWeek()
-		.every(weekOfMonth - 1).weeksOfMonthByDay().next(1);
+	const digitOfNextMonth = date.add(1, 'months').month();
+	const digitOfMonthAfter = date.add(1, 'months').month();
+	const dateOfNextMeeting = date.month(digitOfNextMonth).date(1).hour(0).minute(0).second(0).millisecond(0);
+	const indexOfDay = getDayIndex(dayOfWeek);
+
+	// loop through the days until
+	// the day of the week and the week of the month match our target
+	// or until we get to the end of the month
+	let weekIndex = 1;
+	while (
+		!(dateOfNextMeeting.day() === indexOfDay && weekIndex === weekOfMonth) &&
+		dateOfNextMeeting.month() < digitOfMonthAfter
+	) {
+		if (dateOfNextMeeting.day() === indexOfDay) {
+			weekIndex++;
+		}
+		dateOfNextMeeting.add(1, 'days');
+	}
+
+	// if we got to next month, we didn't find the date
+	if (dateOfNextMeeting.month() === digitOfMonthAfter) {
+		return undefined;
+	}
+
+	return dateOfNextMeeting;
 }
 
 function generateIssueTitle(dayOfWeek, weekOfMonth) {
 	const date = getNextMeeting(dayOfWeek, weekOfMonth);
-	return `${(date[0].format('MMM')).toUpperCase()} ${date[0].format('Do')} at 6:00pm`;
+	return date ? `${(date.format('MMM')).toUpperCase()} ${date.format('Do')} at 6:00pm` : '';
+}
+
+function getDayIndex(dayOfWeek = '') {
+	return DAYS_OF_WEEK.findIndex((day) => day === dayOfWeek.toUpperCase());
 }
 
 function isDayValid(dayOfWeek = '') {
-	return DAYS_OF_WEEK.findIndex((day) => day === dayOfWeek.toUpperCase()) >= 0;
+	return getDayIndex(dayOfWeek) >= 0;
 }
