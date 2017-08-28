@@ -1,0 +1,31 @@
+{
+  "name": "github-issues-webtask",
+  "version": "1.0.0",
+  "description": "A webtask that automatically creates an issue on particular Github repo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gwmccull/github-issues-webtask.git"
+  },
+  "keywords": [
+    "github",
+    "issue",
+    "webtask"
+  ],
+  "author": "Garrett McCullough",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gwmccull/github-issues-webtask/issues"
+  },
+  "homepage": "https://github.com/gwmccull/github-issues-webtask#readme",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "moment": "^2.18.1",
+    "moment-recur": "^1.0.7",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4"
+  }
+}
