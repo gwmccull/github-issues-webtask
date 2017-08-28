@@ -88,6 +88,8 @@ module.exports = function (context, cb) {
 };
 
 function getNextMeeting(dayOfWeek, weekOfMonth) {
+	weekOfMonth = Number(weekOfMonth);
+
 	// reminder: moment mutates the original date
 	const date = moment();
 	const digitOfNextMonth = date.add(1, 'months').month();
