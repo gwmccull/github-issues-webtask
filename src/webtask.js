@@ -28,7 +28,7 @@ module.exports = function (context, cb) {
 	}
 
 	if (!github_token) {
-		err= 'Github token not found in secrets. Did you set up the task correctly?'
+		err= 'Github token not found in secrets. Did you set up the task correctly? The secret must be called `github_token`'
 		return cb(err);
 	}
 
